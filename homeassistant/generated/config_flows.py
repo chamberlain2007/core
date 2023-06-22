@@ -45,6 +45,7 @@ FLOWS = {
         "anthemav",
         "apcupsd",
         "apple_tv",
+        "aprilaire",
         "aranet",
         "arcam_fmj",
         "aseko_pool_live",
