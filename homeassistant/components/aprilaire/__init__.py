@@ -12,7 +12,7 @@ from homeassistant.core import Event, HomeAssistant
 from .const import DOMAIN, LOG_NAME
 from .coordinator import AprilaireCoordinator
 
-PLATFORMS: list[Platform] = [Platform.CLIMATE]
+PLATFORMS: list[Platform] = [Platform.CLIMATE, Platform.HUMIDIFIER]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, **kwargs) -> bool:
