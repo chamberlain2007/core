@@ -67,7 +67,6 @@ FAN_MODE_MAP = {
 class ExtendedClimateEntityFeature(IntFlag):
     """Supported features of the Aprilaire climate entity."""
 
-    TARGET_DEHUMIDITY = 2 << 10
     FRESH_AIR = 2 << 11
     AIR_CLEANING = 2 << 12
 
@@ -118,9 +117,6 @@ class AprilaireClimate(BaseAprilaireEntity, ClimateEntity):
 
         if self._coordinator.data.get(Attribute.HUMIDIFICATION_AVAILABLE) == 2:
             features = features | ClimateEntityFeature.TARGET_HUMIDITY
-
-        if self._coordinator.data.get(Attribute.DEHUMIDIFICATION_AVAILABLE) == 1:
-            features = features | ExtendedClimateEntityFeature.TARGET_DEHUMIDITY
 
         if self._coordinator.data.get(Attribute.AIR_CLEANING_AVAILABLE) == 1:
             features = features | ExtendedClimateEntityFeature.AIR_CLEANING
@@ -270,9 +266,6 @@ class AprilaireClimate(BaseAprilaireEntity, ClimateEntity):
             else "off",
             "humidification_setpoint": self._coordinator.data.get(
                 Attribute.HUMIDIFICATION_SETPOINT
-            ),
-            "dehumidification_setpoint": self._coordinator.data.get(
-                Attribute.DEHUMIDIFICATION_SETPOINT
             ),
             "air_cleaning_mode": {1: "constant", 2: "automatic"}.get(
                 self._coordinator.data.get(Attribute.AIR_CLEANING_MODE, 0), "off"

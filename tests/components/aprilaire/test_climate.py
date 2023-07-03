@@ -221,23 +221,6 @@ def test_supported_features_humidification_available(
     )
 
 
-def test_supported_features_dehumidification_available(
-    climate: AprilaireClimate, coordinator: AprilaireCoordinator
-) -> None:
-    """Test the supported featured with dehumidification available."""
-    coordinator.data = {
-        "dehumidification_available": 1,
-    }
-
-    assert (
-        climate.supported_features
-        == ClimateEntityFeature.TARGET_TEMPERATURE
-        | ExtendedClimateEntityFeature.TARGET_DEHUMIDITY
-        | ClimateEntityFeature.PRESET_MODE
-        | ClimateEntityFeature.FAN_MODE
-    )
-
-
 def test_supported_features_air_cleaning_available(
     climate: AprilaireClimate, coordinator: AprilaireCoordinator
 ) -> None:
