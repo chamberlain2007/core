@@ -26,6 +26,8 @@ _LOGGER = logging.getLogger(__name__)
 class AprilaireCoordinator(BaseDataUpdateCoordinatorProtocol):
     """Coordinator for interacting with the thermostat."""
 
+    data: dict[str, Any]
+
     def __init__(
         self,
         hass: HomeAssistant,
