@@ -32,6 +32,11 @@
         "name": "[%key:component::humidifier::entity_component::dehumidifier::name%]"
       }
     },
+    "number": {
+      "written_outdoor_temperature_value": {
+        "name": "Written outdoor temperature value"
+      }
+    },
     "select": {
       "air_cleaning_event": {
         "name": "Air cleaning event",
