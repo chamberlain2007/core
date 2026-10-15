@@ -133,6 +133,14 @@ async def test_migrate_unpadded_mac_address(
         config_entry=config_entry,
         device_id=device_entry.id,
     )
+    disabled_entity_entry = entity_registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        f"{old_mac}_indoor_temperature_controlling_sensor_status",
+        config_entry=config_entry,
+        device_id=device_entry.id,
+        disabled_by=er.RegistryEntryDisabler.USER,
+    )
     other_entity_entry = entity_registry.async_get_or_create(
         "sensor",
         DOMAIN,
@@ -155,6 +163,13 @@ async def test_migrate_unpadded_mac_address(
     assert entity_entry is not None
     assert entity_entry.unique_id == f"{new_mac}_thermostat"
     assert entity_entry.device_id == device_entry.id
+
+    disabled_entity_entry = entity_registry.async_get(disabled_entity_entry.entity_id)
+    assert disabled_entity_entry is not None
+    assert (
+        disabled_entity_entry.unique_id
+        == f"{new_mac}_indoor_temperature_controlling_sensor_status"
+    )
 
     other_entity_entry = entity_registry.async_get(other_entity_entry.entity_id)
     assert other_entity_entry is not None

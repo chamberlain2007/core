@@ -3,14 +3,20 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 from pyaprilaire.client import AprilaireClient, NackError, ResponseTimeoutError
-from pyaprilaire.const import FunctionalDomain, NackStatus
+from pyaprilaire.const import Attribute, FunctionalDomain, NackStatus
 import pytest
 
 from homeassistant.components.aprilaire.config_flow import (
     STEP_USER_DATA_SCHEMA,
     AprilaireConfigFlow,
 )
+from homeassistant.components.aprilaire.const import DOMAIN
+from homeassistant.config_entries import SOURCE_USER, ConfigEntryDisabler
+from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
+
+from tests.common import MockConfigEntry
 
 
 @pytest.fixture
@@ -173,3 +179,31 @@ async def test_config_flow_optional_reads_fail(
     client.read_thermostat_status.assert_called_once()
     client.read_iaq_status.assert_called_once()
     create_entry_mock.assert_called_once()
+
+
+async def test_config_flow_unmigrated_entry(
+    hass: HomeAssistant, client: AprilaireClient
+) -> None:
+    """Test the flow aborts for a disabled entry with an unpadded MAC address."""
+
+    MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="b4:82:55:0:1a:5",
+        data={CONF_HOST: "localhost", CONF_PORT: 7000},
+        minor_version=1,
+        disabled_by=ConfigEntryDisabler.USER,
+    ).add_to_hass(hass)
+
+    client.data = {Attribute.MAC_ADDRESS: "b4:82:55:00:1a:05"}
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": SOURCE_USER}
+    )
+
+    with patch("pyaprilaire.client.AprilaireClient", return_value=client):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_HOST: "localhost", CONF_PORT: 7000}
+        )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"

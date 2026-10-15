@@ -10,6 +10,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.helpers.device_registry import format_mac
 
+from . import zero_pad_mac
 from .const import DOMAIN
 from .coordinator import AprilaireCoordinator
 
@@ -57,9 +58,16 @@ class AprilaireConfigFlow(ConfigFlow, domain=DOMAIN):
         mac_address = coordinator.data.get(Attribute.MAC_ADDRESS)
 
         if ready and mac_address is not None:
-            await self.async_set_unique_id(format_mac(mac_address))
+            unique_id = format_mac(mac_address)
+            await self.async_set_unique_id(unique_id)
 
             self._abort_if_unique_id_configured()
+
+            # Entries that were disabled when pyaprilaire started zero-padding
+            # the MAC address haven't been migrated yet.
+            for entry in self._async_current_entries(include_ignore=False):
+                if entry.unique_id and zero_pad_mac(entry.unique_id) == unique_id:
+                    return self.async_abort(reason="already_configured")
 
             return self.async_create_entry(title="AprilAire", data=user_input)
 

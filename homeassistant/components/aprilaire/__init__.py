@@ -63,7 +63,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: AprilaireConfigEntry) -
     await hass.config_entries.async_unload_platforms_or_raise(entry, PLATFORMS)
 
 
-def _zero_pad_mac(mac_address: str) -> str:
+def zero_pad_mac(mac_address: str) -> str:
     """Zero-pad each octet of a MAC address formatted by pyaprilaire < 0.10.
 
     Older versions of pyaprilaire dropped the leading zero of octets below
@@ -79,7 +79,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: AprilaireConfigEntry) 
         # pyaprilaire 0.10 zero-pads the octets of the MAC address, which is
         # used as the unique ID of the entry, its entities and its device.
         old_unique_id = entry.unique_id
-        new_unique_id = _zero_pad_mac(old_unique_id) if old_unique_id else None
+        new_unique_id = zero_pad_mac(old_unique_id) if old_unique_id else None
 
         if old_unique_id and new_unique_id and new_unique_id != old_unique_id:
             await _async_migrate_mac_address(hass, entry, old_unique_id, new_unique_id)
